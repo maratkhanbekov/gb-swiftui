@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var login: String = ""
     @State private var password: String = ""
     @State private var keyboardHeight: CGFloat = 0
+
     
     private let kbHeightPublisher = Publishers.Merge(
         NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)
@@ -25,7 +26,7 @@ struct ContentView: View {
     var body: some View {
         
         ZStack {
-            
+
             Color(red: 81/255, green: 129/255, blue: 184/255, opacity: 1)
                 .edgesIgnoringSafeArea(.all)
             ScrollView {
@@ -35,10 +36,10 @@ struct ContentView: View {
                         .resizable()
                         .frame(minWidth: 100, idealWidth: 100, maxWidth: 100, minHeight: 100, idealHeight: 100, maxHeight: 100, alignment: .center)
                     Spacer()
-                    
+
                     VStack (spacing: 20) {
-                        
-                        
+
+
                         HStack (spacing: 10) {
                             Label("Login", systemImage: "person.fill")
                                 .foregroundColor(Color.white)
@@ -49,7 +50,7 @@ struct ContentView: View {
                                 .clipShape(Capsule())
                                 .shadow(radius: 2)
                         }
-                        
+
                         HStack (spacing: 10) {
                             Label("Password", systemImage: "key")
                                 .foregroundColor(Color.white)
@@ -61,9 +62,9 @@ struct ContentView: View {
                                 .shadow(radius: 2)
                         }
                     }.padding(30)
-                    
+
                     Spacer()
-                    
+
                     Button(action: {debugPrint("Login button pressed")}) {
                         Text("Login")
                     }
@@ -74,6 +75,7 @@ struct ContentView: View {
                     .shadow(radius: 2)
                     Spacer()
                         .disabled(login.isEmpty || password.isEmpty)
+
                 }
             }
         }
@@ -85,8 +87,8 @@ struct ContentView: View {
         }
         .onTapGesture {
             UIApplication.shared.endEditing()
+            
         }
-        
     }
 }
 extension UIApplication {
@@ -99,5 +101,68 @@ extension UIApplication {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+    }
+}
+
+
+// 1. Создаем Builder
+@resultBuilder struct MyBuilder {
+    static func buildBlock(_ atrs: String...) -> String {
+        return atrs.reduce("", + )
+    }
+}
+// 2. Добавляем его атрибутом перед кложурой в каком либо методе
+func stringsReduce(@MyBuilder block: () -> String) -> String {
+    return block()
+}
+
+
+
+struct Container <Content : View> : View {
+    var content : Content
+    
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .foregroundColor(Color.blue.opacity(0.3))
+            VStack {
+                Spacer()
+                
+                content
+                    .font(.system(size: 20))
+                    .foregroundColor(.secondary)
+                    .padding()
+                
+                Spacer()
+                
+                Divider()
+                
+                HStack {
+                    Button(action: {
+                        // action
+                    }) {
+                        Image(systemName: "hand.thumbsup")
+                    }.frame(width: 150)
+                    
+                    Divider()
+                    
+                    Button(action: {
+                        // action
+                    }) {
+                        Image(systemName: "hand.thumbsdown")
+                    }
+                    .frame(width: 150)
+                }
+                .font(.system(size: 20))
+                .frame(height: 50)
+                .padding()
+            }
+        }
+        .padding()
+
     }
 }
